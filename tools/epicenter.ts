@@ -13,8 +13,8 @@ export const normalizeFetchResponse = async (
     payload = reader
       ? await reader(response)
       : matchJSON
-      ? await response.json()
-      : await response.text();
+        ? await response.json()
+        : await response.text();
   } catch (parseError) {
     throw new Fault(
       {
@@ -120,13 +120,11 @@ export const explodeZip = (path: string, token: string) => {
   }).then(normalizeFetchResponse);
 };
 
-export const getRunKey = (token: string) => {
-  const url = router().getURL('run/proxy/key');
-  return fetch(url, {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
-  }).then((res) => normalizeFetchResponse(res, (res) => res.text()));
-};
+export const getRunKey = (token: string) =>
+  router()
+    .withAuthorization(`Bearer ${token}`)
+    .get('/run/proxy/key')
+    .then(({ body }) => body);
 
 export const stopProxy = (token: string) => (runKey: string) =>
   router()
